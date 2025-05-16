@@ -1,0 +1,28 @@
+         6695 function calls (4935 primitive calls) in 0.110 seconds
+
+   Ordered by: cumulative time
+   List reduced from 157 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.110    0.110 C:\Users\miche\Music\VisoMaster\app\processors\models_processor.py:237(load_model)
+        1    0.000    0.000    0.106    0.106 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:404(__init__)
+        1    0.106    0.106    0.106    0.106 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:482(_create_inference_session)
+       11    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:173(memory_stats)
+        4    0.000    0.000    0.002    0.001 {built-in method builtins.next}
+        4    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:45(measure_time)
+        8    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:377(memory_allocated)
+        2    0.000    0.000    0.002    0.001 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:196(log_gpu_memory_usage)
+        2    0.000    0.000    0.001    0.001 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\contextlib.py:139(__exit__)
+  1771/11    0.001    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:262(_recurse_add_to_result)
+        4    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:23(get_memory_usage)
+        4    0.001    0.000    0.001    0.000 {built-in method io.open}
+        3    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:415(memory_reserved)
+        1    0.000    0.000    0.001    0.001 C:\Users\miche\Music\VisoMaster\app\helpers\memory_manager.py:262(log_memory_stats)
+        2    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\contextlib.py:130(__enter__)
+        4    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
+       11    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:278(memory_stats_as_nested_dict)
+        4    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+        1    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\memory_manager.py:246(get_gpu_memory_usage)
+       17    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\_utils.py:9(_get_device_index)
+
+

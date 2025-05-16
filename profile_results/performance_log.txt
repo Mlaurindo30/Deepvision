@@ -1,0 +1,34 @@
+[2025-05-07 23:39:14] Profiling data cleared
+[2025-05-07 23:39:14] MONITOR: RAM: 747.87MB | VRAM: 0.00MB / 12287.38MB
+[2025-05-07 23:39:14] GPU Memory [Antes de carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:39:14] PERF: Gerenciamento de cache para modelo RetinaFace - Tempo: 0.0010s | RAM delta: 0.00MB | VRAM delta: 0.00MB
+[2025-05-07 23:39:14] PERF: Carregamento efetivo do modelo RetinaFace - Tempo: 0.0531s | RAM delta: 27.90MB | VRAM delta: 0.00MB
+[2025-05-07 23:39:14] GPU Memory [Após carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:39:14] GPU Memory [Antes de carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:39:14] PERF: Gerenciamento de cache para modelo Inswapper128ArcFace - Tempo: 0.0000s | RAM delta: 0.00MB | VRAM delta: 0.00MB
+[2025-05-07 23:39:15] PERF: Carregamento efetivo do modelo Inswapper128ArcFace - Tempo: 0.1159s | RAM delta: 77.41MB | VRAM delta: 0.00MB
+[2025-05-07 23:39:15] GPU Memory [Após carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:39:15] PERF: Inicialização de ModelsProcessor - Tempo: 0.4723s | RAM delta: 569.51MB | VRAM delta: 9.12MB
+[2025-05-07 23:39:19] MONITOR: RAM: 1346.38MB | VRAM: 9.13MB / 12287.38MB
+[2025-05-07 23:39:24] MONITOR: RAM: 1346.41MB | VRAM: 9.13MB / 12287.38MB
+[2025-05-07 23:39:29] MONITOR: RAM: 1346.51MB | VRAM: 9.13MB / 12287.38MB
+[2025-05-07 23:39:34] MONITOR: RAM: 1356.50MB | VRAM: 9.13MB / 12287.38MB
+[2025-05-07 23:39:39] MONITOR: RAM: 1356.77MB | VRAM: 9.13MB / 12287.38MB
+[2025-05-07 23:40:26] GPU Memory [Antes de carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:40:26] PERF: Gerenciamento de cache para modelo RetinaFace - Tempo: 0.0000s | RAM delta: 0.02MB | VRAM delta: 0.00MB
+[2025-05-07 23:40:26] PERF: Carregamento efetivo do modelo RetinaFace - Tempo: 0.0638s | RAM delta: 27.95MB | VRAM delta: 0.00MB
+[2025-05-07 23:40:26] GPU Memory [Após carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:40:26] GPU Memory [Antes de carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:40:26] PERF: Gerenciamento de cache para modelo Inswapper128ArcFace - Tempo: 0.0000s | RAM delta: 0.00MB | VRAM delta: 0.00MB
+[2025-05-07 23:40:26] PERF: Carregamento efetivo do modelo Inswapper128ArcFace - Tempo: 0.1297s | RAM delta: 65.79MB | VRAM delta: 0.00MB
+[2025-05-07 23:40:26] GPU Memory [Após carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:40:26] PERF: Inicialização de ModelsProcessor - Tempo: 0.4756s | RAM delta: 548.64MB | VRAM delta: 9.12MB
+[2025-05-07 23:41:49] GPU Memory [Antes de carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:41:49] PERF: Gerenciamento de cache para modelo RetinaFace - Tempo: 0.0000s | RAM delta: 0.03MB | VRAM delta: 0.00MB
+[2025-05-07 23:41:50] PERF: Carregamento efetivo do modelo RetinaFace - Tempo: 0.1668s | RAM delta: 28.28MB | VRAM delta: 0.00MB
+[2025-05-07 23:41:50] GPU Memory [Após carregar modelo RetinaFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:41:50] GPU Memory [Antes de carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:41:50] PERF: Gerenciamento de cache para modelo Inswapper128ArcFace - Tempo: 0.0010s | RAM delta: 0.00MB | VRAM delta: 0.00MB
+[2025-05-07 23:41:50] PERF: Carregamento efetivo do modelo Inswapper128ArcFace - Tempo: 0.1063s | RAM delta: 75.49MB | VRAM delta: 0.00MB
+[2025-05-07 23:41:50] GPU Memory [Após carregar modelo Inswapper128ArcFace] - Allocated: 9.13MB, Reserved: 44.00MB
+[2025-05-07 23:41:50] PERF: Inicialização de ModelsProcessor - Tempo: 0.5394s | RAM delta: 526.36MB | VRAM delta: 9.12MB
