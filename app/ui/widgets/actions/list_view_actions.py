@@ -32,6 +32,14 @@ def add_media_thumbnail_to_source_faces_list(main_window: 'MainWindow', media_pa
 
 
 def add_media_thumbnail_button(main_window: 'MainWindow', buttonClass: 'widget_components.CardButton', listWidget:QtWidgets.QListWidget, buttons_list:list, pixmap, **kwargs):
+    print(f"==[DEBUG ADD MINIATURA]==")
+    print(f"Classe do botão: {buttonClass.__name__}")
+    print(f"media_path: {kwargs.get('media_path')}")
+    print(f"file_type: {kwargs.get('file_type')}")
+    print(f"media_id: {kwargs.get('media_id')}")
+    print(f"pixmap é None? {'SIM' if pixmap is None else 'NÃO'}")
+    print(f"pixmap é QPixmap válido? {'SIM' if isinstance(pixmap, QtGui.QPixmap) and not pixmap.isNull() else 'NÃO'}")
+    print(f"kwargs: {kwargs}")
     if buttonClass==widget_components.TargetMediaCardButton:
         constructor_args = (kwargs.get('media_path'), kwargs.get('file_type'), kwargs.get('media_id'))
         if kwargs.get('is_webcam'):
@@ -208,34 +216,32 @@ def select_input_face_images(main_window: 'MainWindow', source_type='folder', fo
     main_window.input_faces_loader_worker.thumbnail_ready.connect(partial(add_media_thumbnail_to_source_faces_list, main_window))
     main_window.input_faces_loader_worker.start()
 
-def set_up_list_widget_placeholder(main_window: 'MainWindow', list_widget: QtWidgets.QListWidget):
-    # Placeholder label
-    placeholder_label = QtWidgets.QLabel(list_widget)
+def set_up_list_widget_placeholder(main_window, list_widget):
+    drop_text = main_window.tr("Drop Files")
+    or_text = main_window.tr("or")
+    click_text = main_window.tr("Click here to Select a Folder")
+
+    placeholder_label = getattr(list_widget, 'placeholder_label', None)
+    if placeholder_label is None:
+        placeholder_label = QtWidgets.QLabel(list_widget)
+        placeholder_label.setStyleSheet("color: gray; font-size: 15px; font-weight: bold;")
+        placeholder_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        layout = QtWidgets.QVBoxLayout(list_widget)
+        layout.addWidget(placeholder_label)
+        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        layout.setContentsMargins(0, 0, 0, 0)
+        list_widget.placeholder_label = placeholder_label
+        list_widget.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
     placeholder_label.setText(
-        "<html><body style='text-align:center;'>"
-        "<p>Drop Files</p>"
-        "<p><b>or</b></p>"
-        "<p>Click here to Select a Folder</p>"
-        "</body></html>"
+        f"<html><body style='text-align:center;'>"
+        f"<p>{drop_text}</p>"
+        f"<p><b>{or_text}</b></p>"
+        f"<p>{click_text}</p>"
+        f"</body></html>"
     )
-    # placeholder_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-    placeholder_label.setStyleSheet("color: gray; font-size: 15px; font-weight: bold;")
-    
-    # Center the label inside the QListWidget
-    # placeholder_label.setGeometry(list_widget.rect())  # Match QListWidget's size
-    placeholder_label.setAttribute(QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents)  # Allow interactions to pass through
-    placeholder_label.setVisible(not list_widget.count())  # Show if the list is empty
+    # Vai esconder quando tiver pelo menos 1 item na lista
+    placeholder_label.setVisible(list_widget.count() == 0)
 
-    # Use a QVBoxLayout to center the placeholder label
-    layout = QtWidgets.QVBoxLayout(list_widget)
-    layout.addWidget(placeholder_label)
-    layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)  # Center the label vertically and horizontally
-    layout.setContentsMargins(0, 0, 0, 0)  # Remove margins to ensure full coverage
-
-    # Keep a reference for toggling visibility later
-    list_widget.placeholder_label = placeholder_label
-    # Set default cursor as PointingHand
-    list_widget.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
 
 def select_output_media_folder(main_window: 'MainWindow'):
     folder_name = QtWidgets.QFileDialog.getExistingDirectory()

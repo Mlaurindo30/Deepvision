@@ -1,28 +1,28 @@
-         6695 function calls (4935 primitive calls) in 0.110 seconds
+         7331 function calls (5552 primitive calls) in 3.948 seconds
 
    Ordered by: cumulative time
-   List reduced from 157 to 20 due to restriction <20>
+   List reduced from 232 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000    0.110    0.110 C:\Users\miche\Music\VisoMaster\app\processors\models_processor.py:237(load_model)
-        1    0.000    0.000    0.106    0.106 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:404(__init__)
-        1    0.106    0.106    0.106    0.106 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:482(_create_inference_session)
-       11    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:173(memory_stats)
-        4    0.000    0.000    0.002    0.001 {built-in method builtins.next}
-        4    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:45(measure_time)
-        8    0.000    0.000    0.002    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:377(memory_allocated)
-        2    0.000    0.000    0.002    0.001 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:196(log_gpu_memory_usage)
-        2    0.000    0.000    0.001    0.001 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\contextlib.py:139(__exit__)
-  1771/11    0.001    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:262(_recurse_add_to_result)
-        4    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\profiler.py:23(get_memory_usage)
-        4    0.001    0.000    0.001    0.000 {built-in method io.open}
-        3    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:415(memory_reserved)
-        1    0.000    0.000    0.001    0.001 C:\Users\miche\Music\VisoMaster\app\helpers\memory_manager.py:262(log_memory_stats)
-        2    0.000    0.000    0.001    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\contextlib.py:130(__enter__)
-        4    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
-       11    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\memory.py:278(memory_stats_as_nested_dict)
-        4    0.000    0.000    0.000    0.000 {built-in method builtins.print}
-        1    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\app\helpers\memory_manager.py:246(get_gpu_memory_usage)
-       17    0.000    0.000    0.000    0.000 C:\Users\miche\Music\VisoMaster\dependencies\Python\lib\site-packages\torch\cuda\_utils.py:9(_get_device_index)
+        1    0.000    0.000    3.948    3.948 i:\Deepvision\app\processors\models_processor.py:237(load_model)
+        1    0.000    0.000    3.710    3.710 C:\Users\miche\.conda\envs\visomaster\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:404(__init__)
+        1    3.710    3.710    3.710    3.710 C:\Users\miche\.conda\envs\visomaster\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:482(_create_inference_session)
+     14/9    0.000    0.000    0.231    0.026 {method 'emit' of 'PySide6.QtCore.SignalInstance' objects}
+        1    0.000    0.000    0.207    0.207 i:\Deepvision\app\ui\widgets\progress_dialog.py:324(finish_loading)
+       12    0.206    0.017    0.206    0.017 {method 'acquire' of '_thread.lock' objects}
+        1    0.000    0.000    0.205    0.205 C:\Users\miche\.conda\envs\visomaster\lib\threading.py:1064(join)
+        2    0.000    0.000    0.205    0.102 C:\Users\miche\.conda\envs\visomaster\lib\threading.py:1102(_wait_for_tstate_lock)
+     15/7    0.015    0.001    0.022    0.003 {built-in method processEvents}
+        5    0.000    0.000    0.019    0.004 i:\Deepvision\app\ui\widgets\progress_dialog.py:225(update_progress)
+     11/5    0.000    0.000    0.019    0.004 i:\Deepvision\app\ui\widgets\progress_dialog.py:139(_perform_ui_update)
+        1    0.000    0.000    0.005    0.005 i:\Deepvision\app\ui\widgets\progress_dialog.py:216(ensure_dialog_shown)
+        1    0.000    0.000    0.005    0.005 i:\Deepvision\app\ui\widgets\progress_dialog.py:181(start_loading)
+        4    0.000    0.000    0.004    0.001 {built-in method builtins.next}
+        4    0.000    0.000    0.004    0.001 i:\Deepvision\app\helpers\profiler.py:45(measure_time)
+        1    0.003    0.003    0.003    0.003 {method 'show' of 'PySide6.QtWidgets.QWidget' objects}
+        1    0.000    0.000    0.003    0.003 i:\Deepvision\app\ui\widgets\progress_dialog.py:370(safe_hide)
+        2    0.000    0.000    0.003    0.001 C:\Users\miche\.conda\envs\visomaster\lib\contextlib.py:139(__exit__)
+       11    0.000    0.000    0.003    0.000 C:\Users\miche\.conda\envs\visomaster\lib\site-packages\torch\cuda\memory.py:173(memory_stats)
+        2    0.000    0.000    0.002    0.001 i:\Deepvision\app\helpers\profiler.py:196(log_gpu_memory_usage)
 
 

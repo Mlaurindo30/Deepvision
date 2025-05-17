@@ -8,9 +8,10 @@ from PySide6.QtCore import Qt
 from app.ui import main_ui
 from PySide6 import QtWidgets 
 import qdarktheme
-from app.ui.core.proxy_style import ProxyStyle
 
-# Adicionamos a opção de perfilamento
+# Se não existe mais ProxyStyle, REMOVE esse import!
+# from app.ui.core.proxy_style import ProxyStyle
+
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='VisoMaster - Face Swap and Edit Application')

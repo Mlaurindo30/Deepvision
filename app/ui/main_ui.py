@@ -38,6 +38,15 @@ from app.helpers.typing_helper import (FacesParametersTypes, ParametersTypes, Co
 # Import movido para o topo
 from app.ui.widgets.widget_components import ParameterResetDefaultButton 
 
+import os
+
+def load_qss(filename):
+    if not os.path.isfile(filename):
+        print(f"[QSS] Arquivo '{filename}' não encontrado.")
+        return ""
+    with open(filename, "r", encoding="utf-8") as f:
+        return f.read()
+
 ParametersWidgetTypes = Dict[str, widget_components.ToggleButton|widget_components.SelectionBox|widget_components.ParameterDecimalSlider|widget_components.ParameterSlider|widget_components.ParameterText]
 
 CONFIG_FILE = 'config.json'
@@ -73,6 +82,9 @@ TRANSLATIONS = {
         'Marcador Anterior': 'Marcador Anterior',
         'Ir para Frame': 'Ir para Frame',
         'Imagens': 'Imagens',
+        'Drop Files': 'Arraste arquivos',
+        'or': 'ou',
+        'Click here to Select a Folder': 'Clique aqui para selecionar uma pasta',
         'Vídeos': 'Vídeos',
         'Webcams': 'Webcams',
         'Uso de VRAM: %p%': 'Uso de VRAM: %p%',
@@ -361,6 +373,9 @@ TRANSLATIONS = {
         'Marcador Anterior': 'Previous Marker',
         'Ir para Frame': 'Go to Frame',
         'Imagens': 'Images',
+        'Drop Files': 'Drop Files',
+        'or': 'or',
+        'Click here to Select a Folder': 'Click here to Select a Folder',
         'Vídeos': 'Videos',
         'Webcams': 'Webcams',
         'Uso de VRAM: %p%': 'VRAM Usage: %p%',
@@ -647,6 +662,9 @@ TRANSLATIONS = {
         'Marcador Anterior': 'Предыдущий маркер',
         'Ir para Frame': 'Перейти к кадру',
         'Imagens': 'Изображения',
+        'Drop Files': 'Перетащите файлы',
+        'or': 'или', 
+        'Click here to Select a Folder': 'Нажмите здесь, чтобы выбрать папку',
         'Vídeos': 'Видео',
         'Webcams': 'Веб-камеры',
         'Uso de VRAM: %p%': 'Использование VRAM: %p%',
@@ -930,6 +948,9 @@ TRANSLATIONS = {
         'Marcador Anterior': '上一个标记',
         'Ir para Frame': '跳转到帧',
         'Imagens': '图片',
+        'Drop Files': '将文件拖放到此处',
+        'or': '或',
+        'Click here to Select a Folder': '点击此处选择文件夹',
         'Vídeos': '视频',
         'Webcams': '摄像头',
         'Uso de VRAM: %p%': '显存使用率: %p%',
@@ -1188,41 +1209,6 @@ TRANSLATIONS = {
     },
 } # FECHAMENTO FINAL DO DICIONÁRIO PRINCIPAL
 # Função para aplicar tema
-def apply_theme(app, theme_text): # Renomeado para evitar conflito com self.tema
-    app.setStyleSheet("")
-    # Normalizar para inglês para comparação
-    theme_map = {'Claro': 'Light', 'Escuro': 'Dark', 'Светлая': 'Light', 'Тёмная': 'Dark', '浅色': 'Light', '深色': 'Dark'}
-    theme_normalized = theme_map.get(theme_text, 'Light') # Usa 'Light' se não encontrar
-
-    if theme_normalized == 'Dark':
-        app.setStyleSheet('''
-            QWidget { background-color: #232629; color: #f0f0f0; font-family: Arial; font-size: 9pt; }
-            QPushButton { background-color: #353535; color: #f0f0f0; border: 1px solid #555; padding: 5px; }
-            QPushButton:hover { background-color: #454545; }
-            QPushButton:pressed { background-color: #252525; }
-            QLineEdit, QComboBox, QSpinBox { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; padding: 3px; }
-            QSlider::groove:horizontal { border: 1px solid #555; height: 8px; background: #2c2c2c; margin: 2px 0; border-radius: 4px; }
-            QSlider::handle:horizontal { background: #555; border: 1px solid #888; width: 18px; margin: -5px 0; border-radius: 9px; }
-            QMenuBar { background-color: #232629; color: #f0f0f0; }
-            QMenu { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; }
-            QMenu::item:selected { background-color: #353535; }
-            QTabWidget::pane { border-top: 1px solid #555; }
-            QTabBar::tab { background: #2c2c2c; color: #f0f0f0; border: 1px solid #555; border-bottom: none; padding: 5px; }
-            QTabBar::tab:selected { background: #353535; margin-bottom: -1px; }
-            QTabBar::tab:!selected { margin-top: 2px; }
-            QGroupBox { border: 1px solid #555; margin-top: 10px; }
-            QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 3px; background-color: #232629; color: #f0f0f0;}
-            QListWidget { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; }
-            QDockWidget { background-color: #232629; color: #f0f0f0; }
-            QDockWidget::title { background-color: #353535; text-align: left; padding: 5px; border: 1px solid #555; }
-            QCheckBox { color: #f0f0f0; }
-            QLabel { color: #f0f0f0; }
-            QProgressBar { border: 1px solid grey; border-radius: 5px; text-align: center; background-color: #2c2c2c; color: #f0f0f0; }
-            QProgressBar::chunk { background-color: #05B8CC; width: 20px; }
-            QToolTip { background-color: #353535; color: #f0f0f0; border: 1px solid #555; }
-        ''')
-    else: # Tema Claro ou padrão
-        app.setStyleSheet('')
 
 # Função para traduzir textos do SettingsDialog
 def translate_settings_dialog(dlg, tr_func):
@@ -1317,124 +1303,211 @@ class CacheSettingsDialog(QDialog):
 
     def get_settings(self):
         return {'format': self.format_combo.currentText(), 'quality': self.quality_slider.value()}
+    
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QTabWidget, QLabel, QComboBox, QLineEdit, QPushButton,
+    QHBoxLayout, QSpinBox, QSlider, QDialogButtonBox, QWidget, QCheckBox, QFileDialog, QMessageBox
+)
+from PySide6.QtCore import Qt
+from pathlib import Path
+import shutil
 
+THEMES_BY_LANG = {
+    "Português": ["Claro", "Escuro"],
+    "English": ["Light", "Dark"],
+    "Русский": ["Светлая", "Тёмная"],
+    "中文": ["浅色", "深色"]
+}
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
         self.main_window = main_window
-        self.tr_func = getattr(main_window, 'tr', lambda x: x) 
+        self.tr_func = getattr(main_window, 'tr', lambda x: x)
         self.setMinimumWidth(400)
-        
+
         layout = QVBoxLayout(self)
         self.tabs = QTabWidget()
         layout.addWidget(self.tabs)
 
-        # Criação das Abas (usando self.tr_func para textos iniciais)
-        # Aba Geral
-        tab_geral = QtWidgets.QWidget(); geral_layout = QVBoxLayout(tab_geral)
-        self.labelIdioma = QLabel(); self.labelIdioma.setObjectName("labelIdioma"); geral_layout.addWidget(self.labelIdioma)
-        self.idioma_combo = QComboBox(); self.idioma_combo.addItems(['Português', 'English', 'Русский', '中文']); geral_layout.addWidget(self.idioma_combo)
-        self.labelTema = QLabel(); self.labelTema.setObjectName("labelTema"); geral_layout.addWidget(self.labelTema)
-        self.tema_combo = QComboBox(); self.tema_combo.addItems(['Claro', 'Escuro']); geral_layout.addWidget(self.tema_combo)
-        self.labelOutputDir = QLabel(); self.labelOutputDir.setObjectName("labelOutputDir"); geral_layout.addWidget(self.labelOutputDir)
-        dir_layout = QHBoxLayout(); self.output_dir_line = QLineEdit(); self.output_dir_line.setReadOnly(True); dir_layout.addWidget(self.output_dir_line)
-        self.output_dir_btn = QPushButton(); self.output_dir_btn.setObjectName("outputDirBtn"); dir_layout.addWidget(self.output_dir_btn)
-        self.output_dir_btn.clicked.connect(self.select_output_dir); geral_layout.addLayout(dir_layout)
-        self.tabs.addTab(tab_geral, self.tr_func('General'))
+        # ======= Aba Geral =======
+        tab_geral = QWidget()
+        geral_layout = QVBoxLayout(tab_geral)
+        # Idioma
+        self.labelIdioma = QLabel(self.tr_func("Idioma:"))
+        geral_layout.addWidget(self.labelIdioma)
+        self.idioma_combo = QComboBox()
+        self.idioma_combo.addItems(['Português', 'English', 'Русский', '中文'])
+        geral_layout.addWidget(self.idioma_combo)
+        # Tema
+        self.labelTema = QLabel(self.tr_func("Tema:"))
+        geral_layout.addWidget(self.labelTema)
+        self.tema_combo = QComboBox()
+        geral_layout.addWidget(self.tema_combo)
+        # Diretório de saída
+        self.labelOutputDir = QLabel(self.tr_func("Diretório de Saída:"))
+        geral_layout.addWidget(self.labelOutputDir)
+        dir_layout = QHBoxLayout()
+        self.output_dir_line = QLineEdit()
+        self.output_dir_line.setReadOnly(True)
+        dir_layout.addWidget(self.output_dir_line)
+        self.output_dir_btn = QPushButton(self.tr_func("Selecionar Pasta"))
+        dir_layout.addWidget(self.output_dir_btn)
+        self.output_dir_btn.clicked.connect(self.select_output_dir)
+        geral_layout.addLayout(dir_layout)
+        self.tabs.addTab(tab_geral, self.tr_func('Geral'))
 
-        # Aba Desempenho
-        tab_perf = QtWidgets.QWidget(); perf_layout = QVBoxLayout(tab_perf)
-        self.labelDevice = QLabel(); self.labelDevice.setObjectName("labelDevice"); perf_layout.addWidget(self.labelDevice)
-        self.device_combo = QComboBox(); self.device_combo.addItems(['Auto', 'CPU', 'GPU 0', 'GPU 1']); perf_layout.addWidget(self.device_combo)
-        self.labelThreads = QLabel(); self.labelThreads.setObjectName("labelThreads"); perf_layout.addWidget(self.labelThreads)
-        self.threads_spin = QSpinBox(); self.threads_spin.setMinimum(1); self.threads_spin.setMaximum(os.cpu_count() or 32); self.threads_spin.setEnabled(True); perf_layout.addWidget(self.threads_spin)
-        self.labelVramLimit = QLabel(); self.labelVramLimit.setObjectName("labelVramLimit"); perf_layout.addWidget(self.labelVramLimit)
-        self.vram_slider = QSlider(QtCore.Qt.Orientation.Horizontal); self.vram_slider.setMinimum(512); self.vram_slider.setMaximum(32768); perf_layout.addWidget(self.vram_slider)
-        self.vram_label = QLabel(); self.vram_label.setObjectName("vramLabel"); perf_layout.addWidget(self.vram_label)
-        self.vram_slider.valueChanged.connect(lambda v: self.vram_label.setText(str(v) + ' MB'))
-        self.tabs.addTab(tab_perf, self.tr_func('Desempenho'))
+        # ======= Aba Desempenho =======
+        tab_desempenho = QWidget()
+        desempenho_layout = QVBoxLayout(tab_desempenho)
+        # Device
+        self.labelDevice = QLabel(self.tr_func("Dispositivo:"))
+        desempenho_layout.addWidget(self.labelDevice)
+        self.device_combo = QComboBox()
+        self.device_combo.addItems(['Auto', 'CPU', 'GPU'])
+        desempenho_layout.addWidget(self.device_combo)
+        # Threads
+        self.labelThreads = QLabel(self.tr_func("Threads:"))
+        desempenho_layout.addWidget(self.labelThreads)
+        self.threads_spin = QSpinBox()
+        self.threads_spin.setRange(1, 64)
+        desempenho_layout.addWidget(self.threads_spin)
+        # VRAM
+        self.labelVram = QLabel(self.tr_func("Limite de VRAM (MB):"))
+        desempenho_layout.addWidget(self.labelVram)
+        self.vram_slider = QSlider(Qt.Horizontal)
+        self.vram_slider.setMinimum(128)
+        self.vram_slider.setMaximum(32768)
+        self.vram_slider.setSingleStep(128)
+        self.vram_slider.setValue(4096)
+        desempenho_layout.addWidget(self.vram_slider)
+        self.vram_label = QLabel(str(self.vram_slider.value()) + " MB")
+        desempenho_layout.addWidget(self.vram_label)
+        self.vram_slider.valueChanged.connect(lambda v: self.vram_label.setText(f"{v} MB"))
+        self.tabs.addTab(tab_desempenho, self.tr_func('Desempenho'))
 
-        # Aba Cache
-        tab_cache = QtWidgets.QWidget(); cache_layout = QVBoxLayout(tab_cache)
-        self.labelCacheFormat = QLabel(); self.labelCacheFormat.setObjectName("labelCacheFormat"); cache_layout.addWidget(self.labelCacheFormat)
-        self.format_combo = QComboBox(); self.format_combo.addItems(['webp', 'jpeg', 'png']); cache_layout.addWidget(self.format_combo)
-        self.labelCacheQuality = QLabel(); self.labelCacheQuality.setObjectName("labelCacheQuality"); cache_layout.addWidget(self.labelCacheQuality)
-        self.quality_slider = QSlider(QtCore.Qt.Orientation.Horizontal); self.quality_slider.setMinimum(50); self.quality_slider.setMaximum(100); cache_layout.addWidget(self.quality_slider)
-        self.quality_label = QLabel(); self.quality_label.setObjectName("qualityLabel"); cache_layout.addWidget(self.quality_label)
+        # ======= Aba Cache =======
+        tab_cache = QWidget()
+        cache_layout = QVBoxLayout(tab_cache)
+        # Formato do Cache
+        self.labelCacheFormat = QLabel(self.tr_func("Formato do Cache:"))
+        cache_layout.addWidget(self.labelCacheFormat)
+        self.format_combo = QComboBox()
+        self.format_combo.addItems(['webp', 'jpeg', 'png'])
+        cache_layout.addWidget(self.format_combo)
+        # Qualidade do Cache
+        self.labelCacheQuality = QLabel(self.tr_func("Qualidade do Cache:"))
+        cache_layout.addWidget(self.labelCacheQuality)
+        self.quality_slider = QSlider(Qt.Horizontal)
+        self.quality_slider.setMinimum(50)
+        self.quality_slider.setMaximum(100)
+        cache_layout.addWidget(self.quality_slider)
+        self.quality_label = QLabel(str(self.quality_slider.value()))
+        cache_layout.addWidget(self.quality_label)
         self.quality_slider.valueChanged.connect(lambda v: self.quality_label.setText(str(v)))
-        def update_quality_enabled(): self.quality_slider.setEnabled(self.format_combo.currentText() in ['jpeg', 'webp'])
-        self.format_combo.currentTextChanged.connect(update_quality_enabled); update_quality_enabled()
-        self.clear_cache_btn = QPushButton(); self.clear_cache_btn.setObjectName("clearCacheBtn"); cache_layout.addWidget(self.clear_cache_btn)
+        # Habilita/desabilita qualidade para formatos adequados
+        def update_quality_enabled():
+            self.quality_slider.setEnabled(self.format_combo.currentText() in ['jpeg', 'webp'])
+        self.format_combo.currentTextChanged.connect(update_quality_enabled)
+        update_quality_enabled()
+        # Botão limpar cache
+        self.clear_cache_btn = QPushButton(self.tr_func("Limpar Cache"))
+        cache_layout.addWidget(self.clear_cache_btn)
         self.clear_cache_btn.clicked.connect(self.clear_cache)
         self.tabs.addTab(tab_cache, self.tr_func('Cache'))
 
-        # Aba Logs
-        tab_logs = QtWidgets.QWidget(); logs_layout = QVBoxLayout(tab_logs)
-        self.labelLogLevel = QLabel(); self.labelLogLevel.setObjectName("labelLogLevel"); logs_layout.addWidget(self.labelLogLevel)
-        self.loglevel_combo = QComboBox(); self.loglevel_combo.addItems(['Silencioso', 'Informativo', 'Debug']); logs_layout.addWidget(self.loglevel_combo)
-        self.save_logs_checkbox = QCheckBox(); self.save_logs_checkbox.setObjectName("saveLogsCheckbox"); logs_layout.addWidget(self.save_logs_checkbox)
+        # ======= Aba Logs =======
+        tab_logs = QWidget()
+        logs_layout = QVBoxLayout(tab_logs)
+        # Log level
+        self.labelLogLevel = QLabel(self.tr_func("Nível de Log:"))
+        logs_layout.addWidget(self.labelLogLevel)
+        self.loglevel_combo = QComboBox()
+        self.loglevel_combo.addItems(['Silencioso', 'Informativo', 'Debug'])
+        logs_layout.addWidget(self.loglevel_combo)
+        # Checkbox salvar logs
+        self.save_logs_checkbox = QCheckBox(self.tr_func("Salvar logs em arquivo"))
+        logs_layout.addWidget(self.save_logs_checkbox)
         self.tabs.addTab(tab_logs, self.tr_func('Logs'))
 
-        # Botões OK/Cancelar
-        btns_layout = QHBoxLayout() 
-        self.okButton = QPushButton(); self.okButton.setObjectName("okButton"); 
-        self.cancelButton = QPushButton(); self.cancelButton.setObjectName("cancelButton")
-        btns_layout.addStretch(); btns_layout.addWidget(self.okButton); btns_layout.addWidget(self.cancelButton)
-        layout.addLayout(btns_layout) 
-        self.okButton.clicked.connect(self.accept); self.cancelButton.clicked.connect(self.reject)
+        # ======= Botões OK/Cancelar =======
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layout.addWidget(self.buttonBox)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        # Liga idioma ao tema
+        self.idioma_combo.currentTextChanged.connect(self.on_idioma_changed)
+        self.update_tema_combo(self.idioma_combo.currentText())
+
+    def update_tema_combo(self, idioma):
+        valor_antigo = self.tema_combo.currentText()
+        self.tema_combo.blockSignals(True)
+        self.tema_combo.clear()
+        for nome in THEMES_BY_LANG.get(idioma, THEMES_BY_LANG["Português"]):
+            self.tema_combo.addItem(nome)
+        idx = self.tema_combo.findText(valor_antigo)
+        self.tema_combo.setCurrentIndex(idx if idx >= 0 else 0)
+        self.tema_combo.blockSignals(False)
+
+    def on_idioma_changed(self, idioma):
+        self.update_tema_combo(idioma)
 
     def set_settings(self, settings):
-        """Define os valores dos widgets com base nas configurações atuais da MainWindow."""
+        # Aba Geral
         self.idioma_combo.setCurrentText(settings.get('idioma', 'Português'))
         self.tema_combo.setCurrentText(settings.get('tema', 'Claro'))
         self.output_dir_line.setText(settings.get('output_dir', ''))
+        # Aba Desempenho
         self.device_combo.setCurrentText(settings.get('device', 'Auto'))
         self.threads_spin.setValue(settings.get('num_threads', 2))
         self.vram_slider.setValue(settings.get('vram_limit', 4096))
-        self.vram_label.setText(str(settings.get('vram_limit', 4096)) + ' MB') 
+        self.vram_label.setText(str(settings.get('vram_limit', 4096)) + ' MB')
+        # Aba Cache
         self.format_combo.setCurrentText(settings.get('cache_format', 'webp'))
         self.quality_slider.setValue(settings.get('cache_quality', 90))
-        self.quality_label.setText(str(settings.get('cache_quality', 90))) 
-        self.quality_slider.setEnabled(self.format_combo.currentText() in ['jpeg', 'webp']) 
+        self.quality_label.setText(str(settings.get('cache_quality', 90)))
+        self.quality_slider.setEnabled(self.format_combo.currentText() in ['jpeg', 'webp'])
+        # Aba Logs
         log_level_map_inv = {'Silencioso': 0, 'Informativo': 1, 'Debug': 2}
         self.loglevel_combo.setCurrentIndex(log_level_map_inv.get(settings.get('loglevel', 'Informativo'), 1))
         self.save_logs_checkbox.setChecked(settings.get('save_logs', False))
-
-    def clear_cache(self):
-        # Reutiliza a lógica da MainWindow se possível, ou reimplementa
-        if self.main_window and hasattr(self.main_window, 'clear_cache_action') and callable(self.main_window.clear_cache_action):
-            self.main_window.clear_cache_action() # Exemplo, se existir uma ação na main window
-        else:
-            from app.processors.video_processor import CACHE_BASE_DIR; import shutil
-            cache_dir = Path(CACHE_BASE_DIR)
-            if cache_dir.exists() and cache_dir.is_dir():
-                try: shutil.rmtree(cache_dir); QMessageBox.information(self, self.tr_func('Cache limpo'), self.tr_func('Cache de frames removido com sucesso!'))
-                except Exception as e: QMessageBox.warning(self, self.tr_func('Erro ao Limpar Cache'), f"{self.tr_func('Não foi possível remover o diretório de cache:')}\n{e}")
-            else: QMessageBox.information(self, self.tr_func('Cache limpo'), self.tr_func('Nenhum cache encontrado.'))
-
-    def select_output_dir(self):
-        start_dir = self.output_dir_line.text() if self.output_dir_line.text() else str(Path.home()) # Usar Path.home()
-        dir_path = QFileDialog.getExistingDirectory(self, self.tr_func('Selecionar Diretório de Saída'), start_dir)
-        if dir_path: self.output_dir_line.setText(dir_path)
 
     def get_settings(self):
         log_level_map = {0: 'Silencioso', 1: 'Informativo', 2: 'Debug'}
         return {
             'idioma': self.idioma_combo.currentText(),
             'tema': self.tema_combo.currentText(),
+            'output_dir': self.output_dir_line.text(),
             'device': self.device_combo.currentText(),
             'num_threads': self.threads_spin.value(),
             'vram_limit': self.vram_slider.value(),
-            'output_dir': self.output_dir_line.text(),
             'cache_format': self.format_combo.currentText(),
             'cache_quality': self.quality_slider.value(),
             'loglevel': log_level_map.get(self.loglevel_combo.currentIndex(), 'Informativo'),
             'save_logs': self.save_logs_checkbox.isChecked(),
         }
 
+    def clear_cache(self):
+        try:
+            # Exemplo de caminho, ajuste pro seu app!
+            cache_dir = Path('./cache')
+            if cache_dir.exists() and cache_dir.is_dir():
+                shutil.rmtree(cache_dir)
+                QMessageBox.information(self, self.tr_func('Cache limpo'), self.tr_func('Cache de frames removido com sucesso!'))
+            else:
+                QMessageBox.information(self, self.tr_func('Cache limpo'), self.tr_func('Nenhum cache encontrado.'))
+        except Exception as e:
+            QMessageBox.warning(self, self.tr_func('Erro ao Limpar Cache'), f"{self.tr_func('Não foi possível remover o diretório de cache:')}\n{e}")
+
+    def select_output_dir(self):
+        start_dir = self.output_dir_line.text() if self.output_dir_line.text() else str(Path.home())
+        dir_path = QFileDialog.getExistingDirectory(self, self.tr_func('Selecionar Diretório de Saída'), start_dir)
+        if dir_path:
+            self.output_dir_line.setText(dir_path)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    # Sinais customizados
     placeholder_update_signal = QtCore.Signal(QtWidgets.QListWidget, bool)
     gpu_memory_update_signal = QtCore.Signal(int, int)
     model_loading_signal = QtCore.Signal()
@@ -1442,23 +1515,125 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     display_messagebox_signal = QtCore.Signal(str, str, QtWidgets.QWidget)
 
     def __init__(self):
-        super(MainWindow, self).__init__()
-        # Definir atributos padrão ANTES de carregar config
-        self.idioma = 'Português' 
-        self.tema = 'Claro' 
-        self.dynamic_widgets = [] # Inicializar lista ANTES de qualquer coisa
+        super().__init__()
+        # Inicializa configs
+        self.idioma = 'Português'
+        self.tema = 'Claro'
+        self.dynamic_widgets = []
 
-        self.load_config() # Carregar config que pode sobrescrever os padrões
+        self.load_config()
         self.setupUi(self)
-        self.initialize_variables() # Inicializa outras variáveis e processadores
-        self.initialize_widgets() # Configura widgets, conecta sinais, chama add_widgets_to_tab_layout
+        self.initialize_variables()
+        self.initialize_widgets()
         self.load_last_workspace()
-        
-        # Aplicar tema e idioma ao iniciar (USA OS VALORES FINAIS de self.tema e self.idioma)
+
         print(f"[DEBUG][__init__] Aplicando TEMA inicial: {self.tema}")
-        apply_theme(QtWidgets.QApplication.instance(), self.tema) 
+        self.apply_theme(self.tema)
         print(f"[DEBUG][__init__] Aplicando IDIOMA inicial: {self.idioma}")
-        self.apply_language(self.idioma) 
+        self.apply_language(self.idioma)
+
+    def apply_theme(self, tema_texto=None):
+        app = QtWidgets.QApplication.instance()
+        tema = tema_texto if tema_texto else getattr(self, 'tema', 'Claro')
+
+        tema_map = {
+            'Claro': 'light_style.qss', 'Escuro': 'dark_style.qss',
+            'Светлая': 'light_style.qss', 'Тёмная': 'dark_style.qss',
+            '浅色': 'light_style.qss', '深色': 'dark_style.qss',
+            'Light': 'light_style.qss', 'Dark': 'dark_style.qss'
+        }
+        qss_file = tema_map.get(tema, 'light_style.qss')
+        qss_content = None
+        # Tenta carregar do arquivo, se função existir
+        if 'load_qss' in globals() and callable(globals()['load_qss']):
+            qss_content = load_qss(qss_file)
+
+        QSS_LIGHT = '''
+        QWidget { background-color: #f6f6f7; color: #232323; font-family: Arial; font-size: 9pt; }
+        QPushButton { background-color: #fdfdfd; color: #232323; border: 1px solid #ccc; padding: 5px; }
+        QPushButton:hover { background-color: #eaeaea; }
+        QPushButton:pressed { background-color: #e0e0e0; }
+        QLineEdit, QComboBox, QSpinBox { background-color: #fff; color: #232323; border: 1px solid #ccc; padding: 3px; }
+        QSlider::groove:horizontal { border: 1px solid #ccc; height: 8px; background: #f0f0f0; margin: 2px 0; border-radius: 4px; }
+        QSlider::handle:horizontal { background: #d1d1d1; border: 1px solid #aaa; width: 18px; margin: -5px 0; border-radius: 9px; }
+        QMenuBar { background-color: #f6f6f7; color: #232323; }
+        QMenu { background-color: #fff; color: #232323; border: 1px solid #ccc; }
+        QMenu::item:selected { background-color: #eaeaea; }
+        QTabWidget::pane { border-top: 1px solid #ccc; }
+        QTabBar::tab { background: #f0f0f0; color: #232323; border: 1px solid #ccc; border-bottom: none; padding: 5px; }
+        QTabBar::tab:selected { background: #fdfdfd; margin-bottom: -1px; }
+        QTabBar::tab:!selected { margin-top: 2px; }
+        QGroupBox { border: 1px solid #ccc; margin-top: 10px; }
+        QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 3px; background-color: #f6f6f7; color: #232323;}
+        QListWidget { background-color: #fff; color: #232323; border: 1px solid #ccc; }
+        QDockWidget { background-color: #f6f6f7; color: #232323; }
+        QDockWidget::title { background-color: #f0f0f0; text-align: left; padding: 5px; border: 1px solid #ccc; }
+        QCheckBox { color: #232323; }
+        QLabel { color: #232323; }
+        QProgressBar { border: 1px solid #ccc; border-radius: 5px; text-align: center; background-color: #fff; color: #232323; }
+        QProgressBar::chunk { background-color: #2196f3; width: 20px; }
+        QToolTip { background-color: #f0f0f0; color: #232323; border: 1px solid #ccc; }
+        '''
+
+        QSS_DARK = '''
+        QWidget { background-color: #232629; color: #f0f0f0; font-family: Arial; font-size: 9pt; }
+        QPushButton { background-color: #353535; color: #f0f0f0; border: 1px solid #555; padding: 5px; }
+        QPushButton:hover { background-color: #454545; }
+        QPushButton:pressed { background-color: #252525; }
+        QLineEdit, QComboBox, QSpinBox { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; padding: 3px; }
+        QSlider::groove:horizontal { border: 1px solid #555; height: 8px; background: #2c2c2c; margin: 2px 0; border-radius: 4px; }
+        QSlider::handle:horizontal { background: #555; border: 1px solid #888; width: 18px; margin: -5px 0; border-radius: 9px; }
+        QMenuBar { background-color: #232629; color: #f0f0f0; }
+        QMenu { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; }
+        QMenu::item:selected { background-color: #353535; }
+        QTabWidget::pane { border-top: 1px solid #555; }
+        QTabBar::tab { background: #2c2c2c; color: #f0f0f0; border: 1px solid #555; border-bottom: none; padding: 5px; }
+        QTabBar::tab:selected { background: #353535; margin-bottom: -1px; }
+        QTabBar::tab:!selected { margin-top: 2px; }
+        QGroupBox { border: 1px solid #555; margin-top: 10px; }
+        QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 3px; background-color: #232629; color: #f0f0f0;}
+        QListWidget { background-color: #2c2c2c; color: #f0f0f0; border: 1px solid #555; }
+        QDockWidget { background-color: #232629; color: #f0f0f0; }
+        QDockWidget::title { background-color: #353535; text-align: left; padding: 5px; border: 1px solid #555; }
+        QCheckBox { color: #f0f0f0; }
+        QLabel { color: #f0f0f0; }
+        QProgressBar { border: 1px solid grey; border-radius: 5px; text-align: center; background-color: #2c2c2c; color: #f0f0f0; }
+        QProgressBar::chunk { background-color: #05B8CC; width: 20px; }
+        QToolTip { background-color: #353535; color: #f0f0f0; border: 1px solid #555; }
+        '''
+
+        if qss_content:
+            app.setStyleSheet(qss_content)
+        else:
+            if tema in ['Escuro', 'Тёмная', '深色', 'Dark', 'dark', 'Escuro', 'escuro']:
+                app.setStyleSheet(QSS_DARK)
+            else:
+                app.setStyleSheet(QSS_LIGHT)
+
+    def tr(self, key):
+        TRANSLATIONS = {
+            "Drop Files": {
+                "Português": "Arraste arquivos",
+                "English": "Drop Files",
+                "Русский": "Перетащите файлы",
+                "中文": "将文件拖放到此处"
+            },
+            "or": {
+                "Português": "ou",
+                "English": "or",
+                "Русский": "или",
+                "中文": "或"
+            },
+            "Click here to Select a Folder": {
+                "Português": "Clique aqui para selecionar uma pasta",
+                "English": "Click here to Select a Folder",
+                "Русский": "Нажмите здесь, чтобы выбрать папку",
+                "中文": "点击此处选择文件夹"
+            }
+        }
+        lang = getattr(self, 'idioma', 'Português')
+        return TRANSLATIONS.get(key, {}).get(lang, key)
+
 
     # FUNÇÃO tr DEFINIDA AQUI
     def tr(self, text):
@@ -1847,7 +2022,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             tema_antigo_norm = tema_map_inv.get(tema_antigo, 'Light')
             print(f"[DEBUG] Chamando apply_theme com tema: {self.tema}, Normalizado: {tema_novo_norm}")
             if tema_novo_norm != tema_antigo_norm:
-                apply_theme(QtWidgets.QApplication.instance(), self.tema) 
+                self.apply_theme(self.tema)
             print(f"[DEBUG] Chamando apply_language com idioma: {self.idioma}")
             if self.idioma != idioma_antigo:
                 self.apply_language(self.idioma) 
