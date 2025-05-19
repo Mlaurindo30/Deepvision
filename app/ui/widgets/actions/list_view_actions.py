@@ -30,8 +30,7 @@ def add_media_thumbnail_to_target_faces_list(main_window: 'MainWindow', cropped_
 def add_media_thumbnail_to_source_faces_list(main_window: 'MainWindow', media_path, cropped_face, embedding_store, pixmap, face_id):
     add_media_thumbnail_button(main_window, widget_components.InputFaceCardButton, main_window.inputFacesList, main_window.input_faces, pixmap, media_path=media_path, cropped_face=cropped_face, embedding_store=embedding_store, face_id=face_id )
 
-
-def add_media_thumbnail_button(main_window: 'MainWindow', buttonClass: 'widget_components.CardButton', listWidget:QtWidgets.QListWidget, buttons_list:list, pixmap, **kwargs):
+def add_media_thumbnail_button(main_window: 'MainWindow', buttonClass: 'widget_components.CardButton', listWidget: QtWidgets.QListWidget, buttons_list: dict, pixmap, **kwargs):
     print(f"==[DEBUG ADD MINIATURA]==")
     print(f"Classe do botão: {buttonClass.__name__}")
     print(f"media_path: {kwargs.get('media_path')}")
@@ -40,42 +39,81 @@ def add_media_thumbnail_button(main_window: 'MainWindow', buttonClass: 'widget_c
     print(f"pixmap é None? {'SIM' if pixmap is None else 'NÃO'}")
     print(f"pixmap é QPixmap válido? {'SIM' if isinstance(pixmap, QtGui.QPixmap) and not pixmap.isNull() else 'NÃO'}")
     print(f"kwargs: {kwargs}")
-    if buttonClass==widget_components.TargetMediaCardButton:
-        constructor_args = (kwargs.get('media_path'), kwargs.get('file_type'), kwargs.get('media_id'))
-        if kwargs.get('is_webcam'):
-            constructor_args+=(kwargs.get('is_webcam'), kwargs.get('webcam_index'), kwargs.get('webcam_backend'))
-    elif buttonClass in (widget_components.TargetFaceCardButton, widget_components.InputFaceCardButton):
-        constructor_args = (kwargs.get('media_path',''), kwargs.get('cropped_face'), kwargs.get('embedding_store'), kwargs.get('face_id'))
-    if buttonClass==widget_components.TargetMediaCardButton:
-        button_size = QtCore.QSize(90, 90)  # Set a fixed size for the buttons
-    else:
-        button_size = QtCore.QSize(70, 70)  # Set a fixed size for the buttons
 
-    button: widget_components.CardButton = buttonClass(*constructor_args, main_window=main_window)
-    button.setIcon(QtGui.QIcon(pixmap))
-    button.setIconSize(button_size - QtCore.QSize(8, 8))  # Slightly smaller than the button size to add some margin
+    # Define argumentos corretos para cada tipo de botão
+    if buttonClass == widget_components.TargetMediaCardButton:
+        constructor_args = (
+            kwargs.get('media_path'),
+            kwargs.get('file_type'),
+            kwargs.get('media_id'),
+            kwargs.get('is_webcam', False),
+            kwargs.get('webcam_index', -1),
+            kwargs.get('webcam_backend', -1)
+        )
+        button_size = QtCore.QSize(90, 90)
+
+    elif buttonClass in (widget_components.TargetFaceCardButton, widget_components.InputFaceCardButton):
+        constructor_args = (
+            kwargs.get('media_path', ''),
+            kwargs.get('cropped_face'),
+            kwargs.get('embedding_store'),
+            kwargs.get('face_id')
+        )
+        button_size = QtCore.QSize(70, 70)
+
+    elif buttonClass == widget_components.EmbeddingCardButton:
+        constructor_args = (
+            kwargs.get('embedding_name'),
+            kwargs.get('embedding_store'),
+            kwargs.get('embedding_id')
+        )
+        button_size = QtCore.QSize(70, 70)
+
+    else:
+        print(f"[ERRO] Classe de botão não reconhecida: {buttonClass.__name__}")
+        return
+
+    # Criação do botão
+    button = buttonClass(*constructor_args, main_window=main_window)
+    button.set_thumbnail(pixmap, button_size)
+    button.setFixedSize(button_size)  # Agora passa o tamanho certo!
+    print(f"Botão criado: {button}, type: {type(button)}")
+    print(f"pixmap: {pixmap}, pixmap é QPixmap válido? {'SIM' if isinstance(pixmap, QtGui.QPixmap) and not pixmap.isNull() else 'NÃO'}")
+    print(f"Tem set_thumbnail? {hasattr(button, 'set_thumbnail')}, Tem setIcon? {hasattr(button, 'setIcon')}")
+    button.set_thumbnail(pixmap)
+    print(f"Depois do set_thumbnail: iconSize={button.iconSize()}, isCheckable={button.isCheckable()}")
+    print(f"==DEBUG add_media_thumbnail_button== kwargs: {kwargs}")
+
     button.setFixedSize(button_size)
     button.setCheckable(True)
+
+    # Salva o botão na lista de controle
     if buttonClass in [widget_components.TargetFaceCardButton, widget_components.InputFaceCardButton]:
         buttons_list[button.face_id] = button
     elif buttonClass == widget_components.TargetMediaCardButton:
         buttons_list[button.media_id] = button
     elif buttonClass == widget_components.EmbeddingCardButton:
         buttons_list[button.embedding_id] = button
-    # Create a QListWidgetItem and set the button as its widget
-    list_item = QtWidgets.QListWidgetItem(listWidget)
-    list_item.setSizeHint(button_size)
-    button.list_item = list_item
-    button.list_widget = listWidget
-    # Align the item to center
+
+    # Cria o item da lista
+    list_item = QtWidgets.QListWidgetItem()
+    list_item.setSizeHint(button.sizeHint())
     list_item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+    listWidget.addItem(list_item)
     listWidget.setItemWidget(list_item, button)
-    # Adjust the QListWidget properties to handle the grid layout
-    grid_size_with_padding = button_size + QtCore.QSize(4, 4)  # Add padding around the buttons
-    listWidget.setGridSize(grid_size_with_padding)  # Set grid size with padding
-    listWidget.setWrapping(True)  # Enable wrapping to have items in rows
-    listWidget.setFlow(QtWidgets.QListView.LeftToRight)  # Set flow direction
-    listWidget.setResizeMode(QtWidgets.QListView.Adjust)  # Adjust layout automatically
+
+    # Prints para debug depois que tudo foi setado:
+    print("TAMANHO FINAL do botão:", button.size())
+    print("TAMANHO DO ÍCONE:", button.iconSize())
+    print("TAMANHO DA LISTA:", listWidget.size())
+
+    # Essas configs precisam ser sempre aplicadas!
+    listWidget.setViewMode(QtWidgets.QListView.IconMode)          # MOSTRAR COMO ÍCONE, NÃO LISTA
+    listWidget.setIconSize(button_size)                            # Ícone/thumbnail do tamanho do botão
+    listWidget.setGridSize(button_size + QtCore.QSize(10, 10))     # Dá um espaço extra no grid
+    listWidget.setWrapping(True)
+    listWidget.setFlow(QtWidgets.QListView.LeftToRight)
+    listWidget.setResizeMode(QtWidgets.QListView.Adjust)
 
 
 def create_and_add_embed_button_to_list(main_window: 'MainWindow', embedding_name, embedding_store, embedding_id):

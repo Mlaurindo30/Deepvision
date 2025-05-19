@@ -29,6 +29,18 @@ class CardButton(QPushButton):
         self.list_item  = None
         self.list_widget: QtWidgets.QListWidget = None
 
+    def set_thumbnail(self, pixmap, size: QtCore.QSize = None):
+        if pixmap and not pixmap.isNull():
+            self.setIcon(QtGui.QIcon(pixmap))
+            if size is not None:
+               self.setIconSize(size)
+            else:
+               self.setIconSize(QtCore.QSize(50, 50))  # Define padrão se não passar
+        else:
+            self.setIcon(QtGui.QIcon())
+
+
+
     def get_item_position(self):
         for i in range(self.list_widget.count()-1, -1, -1):
             list_item = self.list_widget.item(i)
@@ -83,10 +95,13 @@ class CardButton(QPushButton):
             card_button.setChecked(True)
             card_button.blockSignals(False)
             card_buttons.append(card_button)
-        return card_buttons
+        return card_buttonssa
     
 class TargetMediaCardButton(CardButton):
-    def __init__(self, media_path: str, file_type: str, media_id:str, is_webcam=False, webcam_index=-1, webcam_backend=-1, *args, **kwargs):
+    def reset_related_widgets_and_values(self):
+    # Método vazio para não quebrar o fluxo, pode customizar depois se precisar de limpeza de estado.
+       pass
+    def __init__(self, media_path: str, file_type: str, media_id: str, is_webcam=False, webcam_index=-1, webcam_backend=-1, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.media_id = media_id
         self.file_type = file_type
@@ -94,17 +109,28 @@ class TargetMediaCardButton(CardButton):
         self.is_webcam = is_webcam
         self.webcam_index = webcam_index
         self.webcam_backend = webcam_backend
-        self.media_capture: cv2.VideoCapture|bool = False
+        self.media_capture: cv2.VideoCapture | bool = False
         self.setCheckable(True)
         self.setToolTip(media_path)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(2)  # Space between icon and label
+        layout.setSpacing(0)  # Deixa zero pra não "empurrar" o ícone
+        # Limita altura do botão
+        self.setFixedSize(90, 90)  # MESMO SIZE QUE NO set_thumbnail/button_size
+        
+        # ==== TEXTO ====
         filename = os.path.basename(media_path)
+        if len(filename) > 15:
+            filename = filename[:12] + "..."
         text_label = QtWidgets.QLabel(filename, self)
-        text_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignBottom)
+        text_label.setFixedWidth(90)  # Mesma largura do botão!
+        text_label.setWordWrap(False)
+        text_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignHCenter)
         text_label.setStyleSheet("font-size: 8px; font-weight:bold;")  # Style for the label
+        text_label.setFixedHeight(16)  # Limita a altura do label!
+        layout.addStretch()
         layout.addWidget(text_label)
+
         self.clicked.connect(self.load_media)
         # Imposta lo stylesheet solo per questo pulsante
         self.setStyleSheet("""
@@ -114,42 +140,108 @@ class TargetMediaCardButton(CardButton):
         }
         """)
 
-        # Set the context menu policy to trigger the custom context menu on right-click
+         # Set the context menu policy to trigger the custom context menu on right-click
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # Connect the custom context menu request signal to the custom slot
         self.customContextMenuRequested.connect(self.on_context_menu)
         self.create_context_menu()
-
-    def reset_media_state(self):
+        
+    def load_media(self):
         main_window = self.main_window
         # Deselect the currently selected video
         if main_window.selected_video_button:
-            main_window.selected_video_button.toggle()  # Deselect the previous video
+            main_window.selected_video_button.toggle()
             main_window.selected_video_button = False
-        
+
         # Stop the current video processing
         main_window.video_processor.stop_processing()
 
-    def reset_related_widgets_and_values(self):
-        main_window = self.main_window
+        if main_window.selected_target_face_id:
+            main_window.current_widget_parameters = main_window.parameters[main_window.selected_target_face_id].copy()
 
-        # Set up videoSeekLineEdit
-        video_control_actions.set_up_video_seek_line_edit(main_window)
-        # Clear current target faces
-        card_actions.clear_target_faces(main_window, refresh_frame=False)
-        # Uncheck input faces
-        card_actions.uncheck_all_input_faces(main_window)
-        # Uncheck merged embeddings
-        card_actions.uncheck_all_merged_embeddings(main_window)
-        # Remove all markers
-        video_control_actions.remove_all_markers(main_window)
+        if main_window.control.get('AutoSwapToggle'):
+            prev_selected_input_faces = [face for _,face in main_window.input_faces.items() if face.isChecked()]
+            prev_selected_embeddings = [embed for _,embed in main_window.merged_embeddings.items() if embed.isChecked()]
+        main_window.video_processor.current_frame_number = 0
+        main_window.video_processor.media_path = self.media_path
+        main_window.parameters = {}
+        main_window.selected_target_face_id = False
+        main_window.video_processor.current_frame = []
 
-        main_window.cur_selected_target_face_button = False
+        if main_window.video_processor.media_capture:
+            main_window.video_processor.media_capture.release()
 
-        # Reset buttons and slider
-        video_control_actions.reset_media_buttons(main_window)
+        frame = None
+        max_frames_number = 0
 
-    def load_media(self):
+        if self.file_type == 'video':
+            media_capture = cv2.VideoCapture(self.media_path)
+            if not media_capture.isOpened():
+                print(f"Error opening video {self.media_path}")
+                return
+            media_capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            max_frames_number = int(media_capture.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+            _, frame = misc_helpers.read_frame(media_capture)
+            main_window.video_processor.media_capture = media_capture
+            self.media_capture = media_capture
+            main_window.video_processor.fps = media_capture.get(cv2.CAP_PROP_FPS)
+            main_window.video_processor.max_frame_number = max_frames_number
+
+        elif self.file_type == 'image':
+            frame = misc_helpers.read_image_file(self.media_path)
+            max_frames_number = 0
+            main_window.video_processor.max_frame_number = max_frames_number
+
+        elif self.file_type == 'webcam':
+            res_width, res_height = self.main_window.control['WebcamMaxResSelection'].split('x')
+            media_capture = cv2.VideoCapture(self.webcam_index, self.webcam_backend)
+            media_capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(res_width))
+            media_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(res_height))
+            max_frames_number = 999999
+            _, frame = misc_helpers.read_frame(media_capture)
+            main_window.video_processor.media_capture = media_capture
+            self.media_capture = media_capture
+            main_window.video_processor.fps = media_capture.get(cv2.CAP_PROP_FPS)
+            main_window.video_processor.max_frame_number = max_frames_number
+
+        if frame is not None:
+            main_window.scene.clear()
+            if self.file_type == 'video':
+                media_capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            main_window.video_processor.current_frame = frame
+            pixmap = common_widget_actions.get_pixmap_from_frame(main_window, frame)
+            graphics_view_actions.update_graphics_view(main_window, pixmap, 0, reset_fit=True)
+
+        self.reset_related_widgets_and_values()
+
+        main_window.video_processor.file_type = self.file_type
+        main_window.videoSeekSlider.blockSignals(True)
+        main_window.videoSeekSlider.setMaximum(max_frames_number)
+        main_window.videoSeekSlider.setValue(0)
+        main_window.videoSeekSlider.blockSignals(False)
+        main_window.selected_video_button = self
+        main_window.graphicsViewFrame.update()
+        common_widget_actions.set_widgets_values_using_face_id_parameters(main_window=main_window, face_id=False)
+
+        main_window.loading_new_media = True
+        common_widget_actions.refresh_frame(main_window)
+
+        if main_window.control.get('AutoSwapToggle'):
+            card_actions.find_target_faces(main_window)
+            for _, target_face in main_window.target_faces.items():
+                for input_face in prev_selected_input_faces:
+                    target_face.assigned_input_faces[input_face.face_id] = input_face.embedding_store
+                for embedding in prev_selected_embeddings:
+                    target_face.assigned_merged_embeddings[embedding.embedding_id] = embedding.embedding_store
+                target_face.calculate_assigned_input_embedding()
+            if main_window.target_faces:
+                list(main_window.target_faces.values())[0].click()
+            common_widget_actions.refresh_frame(main_window)
+            layout_actions.fit_image_to_view_onchange(main_window)
+
+        if main_window.control['SendVirtCamFramesEnableToggle'] and self.file_type != 'image':
+            main_window.video_processor.enable_virtualcam()
+
 
         main_window = self.main_window
         # Deselect the currently selected video
@@ -516,6 +608,8 @@ class InputFaceCardButton(CardButton):
             border: 2px solid #1abc9c;
         }
         """)
+
+
 
         # Set the context menu policy to trigger the custom context menu on right-click
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
